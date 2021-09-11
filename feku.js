@@ -64,14 +64,14 @@ let generateStores = (count, database) => {
     for (let i = 0; i < count; i++) {
         let storeId = uuidv4();
         dmlQuery += `('${storeId}', '${getRandomItem(retailers)}', 'store-00${i}', ['${faker.address.latitude()}', '${faker.address.longitude()}']),`
-        // let storeSplice = {
-        //     storeId: storeId,
-        //     retailerId: getRandomItem(retailers),
-        //     title: `store-00${i}`,
-        //     location: faker.address.city(),
-        // }
+        let storeSplice = {
+            storeId: storeId,
+            retailerId: getRandomItem(retailers),
+            title: `store-00${i}`,
+            location: faker.address.city(),
+        }
         stores.push(storeId);
-        // generatedStores.push(storeSplice);
+        generatedStores.push(storeSplice);
     }
     console.log(dmlQuery);
     console.log(stores)
@@ -91,13 +91,13 @@ let generateSkusStores = (count, database) => {
                 dmlQuery += `('${skusStoresId}', '${sku}', '${store}', ${Math.floor((Math.random() * 100) + 1)}),`;
                 generatedSkusStores.push(store);
             }
-            // let ssSplice = {
-            //     skusStoresId: skusStoresId,
-            //     skuId: getRandomItem(skus),
-            //     storeId: getRandomItem(stores),
-            //     quantity: faker.random.number()
-            // }
-            // generatedSkusStores.push(ssSplice)
+            let ssSplice = {
+                skusStoresId: skusStoresId,
+                skuId: getRandomItem(skus),
+                storeId: getRandomItem(stores),
+                quantity: faker.random.number()
+            }
+            generatedSkusStores.push(ssSplice)
         }
     })
     fs.writeFile('./skuStoreInsert.sql', dmlQuery, function(err) {
@@ -106,63 +106,63 @@ let generateSkusStores = (count, database) => {
         }
         console.log("The query file was saved!");
     })
-    // fs.writeFile('./skuList.json', JSON.stringify(skus), function(err) {
-    //     if(err) {
-    //         return console.log(err);
-    //     }
-    //     console.log("The json file was saved!");
-    // })
+    fs.writeFile('./skuList.json', JSON.stringify(skus), function(err) {
+        if(err) {
+            return console.log(err);
+        }
+        console.log("The json file was saved!");
+    })
     return generateSkusStores;
 }
 
 let generateSkus = (count, database) => {
     console.log(`Generating ${count} SKUS`);
     
-    // database.runTransaction(async (err, transaction) => {
-    //     if (err) {
-    //         console.error(err);
-    //         return;
-    //     }
-    //     try {
-    //         const [rowCount] = await transaction.runUpdate({
-    //             sql: dmlQuery,
-    //         });
+    database.runTransaction(async (err, transaction) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        try {
+            const [rowCount] = await transaction.runUpdate({
+                sql: dmlQuery,
+            });
 
-    //         console.log(
-    //             `Successfully inserted ${rowCount} record into the Singers table.`
-    //         );
-    //         await transaction.commit();
-    //     } catch (err) {
-    //         console.error('ERROR:', err);
-    //     } finally {
-    //         // Close the database when finished.
-    //         // database.close();
-    //     }
-    // });
+            console.log(
+                `Successfully inserted ${rowCount} record into the Singers table.`
+            );
+            await transaction.commit();
+        } catch (err) {
+            console.error('ERROR:', err);
+        } finally {
+            // Close the database when finished.
+            // database.close();
+        }
+    });
     let dmlQuery = `INSERT sku (sku_id, retailer_id, title, price, description, category, sub_category, photo_url, tags) VALUES`;
     for (let i = 0; i < count; i++) {
         let skuId = uuidv4();
 
         dmlQuery += `('${skuId}', '${getRandomItem(retailers)}', '${faker.commerce.productName()}', ${faker.commerce.price()}, '', '${faker.commerce.department()}', '${faker.commerce.department()}', '${faker.image.imageUrl()}', 
             ['${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}']),`
-        // let skuSplice = {
-        //     skuId: skuId,
-        //     retailerId: getRandomItem(retailers),
-        //     title: faker.commerce.productName(),
-        //     price: faker.commerce.price(),
-        //     description: "",
-        //     category: faker.commerce.department(),
-        //     subCategory: faker.commerce.department(),
-        //     photoUrl: faker.image.imageUrl(),
-        //     tags: [
-        //         faker.random.word(),
-        //         faker.random.word(),
-        //         faker.random.word(),
-        //         faker.random.word(),
-        //         faker.random.word(),
-        //         faker.random.word()
-        //     ]
-        // }
+        let skuSplice = {
+            skuId: skuId,
+            retailerId: getRandomItem(retailers),
+            title: faker.commerce.productName(),
+            price: faker.commerce.price(),
+            description: "",
+            category: faker.commerce.department(),
+            subCategory: faker.commerce.department(),
+            photoUrl: faker.image.imageUrl(),
+            tags: [
+                faker.random.word(),
+                faker.random.word(),
+                faker.random.word(),
+                faker.random.word(),
+                faker.random.word(),
+                faker.random.word()
+            ]
+        }
         skus.push(skuId);
     }
 
@@ -178,16 +178,16 @@ let generateSkus = (count, database) => {
         }
         console.log("The json file was saved!");
     })
-    // console.log(dmlQuery);
-    // console.log(skus);
+    console.log(dmlQuery);
+    console.log(skus);
     return null;
 }
 
 let generateData = (database) => {
     return {
-        // retailers: generateRetailers(1, database),
-        // stores: generateStores(5, database),
-        // skus: generateSkus(500, database),
+        retailers: generateRetailers(1, database),
+        stores: generateStores(5, database),
+        skus: generateSkus(500, database),
         skusStores: generateSkusStores(3, database)
     }
 }

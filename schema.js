@@ -42,6 +42,7 @@ module.exports = ({$instance}) => {
 
     return {
         createDB : async ($databaseId) => {
+            // creates a database in the instance
             let [database, operation] = await $instance.createDatabase($databaseId, {
                 schema : schema
             });
